@@ -2,8 +2,10 @@ let elem = document.querySelector('#data');
 const companiesSite = "http://localhost:3000/companies";
 const usersSite = "http://localhost:3000/users";
 
-load();
+
 let table ="";
+let units = 0; // from {units} to 10 elements
+load();
 
 async function load() {
 
@@ -11,17 +13,9 @@ async function load() {
     let companies       = await fetch(companiesSite).then(res => res.json());
     let sortedCompanies = await sortCompanyById(user,companies);
 
-    sortedCompanies.forEach(arr => {
-        if (arr.usersAmount > 1) {
-            table += `<tr id="${arr.uri}"><td>${arr.name}</td><td>USERS: ${arr.usersAmount}</td><td><button id="${arr.uri}but" class="btn btn-light" onclick="reduceFunction('${arr.uri}')">Show users</button>`;
-        }else if (arr.usersAmount > 0){
-            table += `<tr id="${arr.uri}"><td>${arr.name}</td><td>USER: ${arr.usersAmount}</td><td><button id="${arr.uri}but" class="btn btn-light" onclick="reduceFunction('${arr.uri}')">Show user</button>`;
-        }else {
-            table += `<tr id="${arr.uri}"><td>${arr.name}</td><td>NO USER</td><td><button id="${arr.uri}but" class="btn btn-light">No user</button>`;
-        }
-    });
-
-    elem.insertAdjacentHTML('beforeend', table);
+   paginationCompany(sortedCompanies, units);
+   elem.insertAdjacentHTML('beforeend', table);
+   ;
 }
 
 
@@ -60,4 +54,37 @@ function sortCompanyById(users, companies){
     });
 
     return companies;
+}
+
+function paginationCompany(srtCompanies, limit) {
+
+
+    for (let i = limit; i < limit + 10; i++) {
+        let company = srtCompanies[i];
+        if (company.usersAmount > 0) {
+            table += `<tr id="${company.uri}"><td>${company.name}</td><td>USERS: ${company.usersAmount}</td><td><button id="${company.uri}but" class="btn btn-light" onclick="reduceFunction('${company.uri}')">Show users</button>`;
+        } else if (company.usersAmount > 0) {
+            table += `<tr id="${company.uri}"><td>${company.name}</td><td>USER: ${company.usersAmount}</td><td><button id="${company.uri}but" class="btn btn-light" onclick="reduceFunction('${company.uri}')">Show user</button>`;
+        } else {
+            table += `<tr id="${company.uri}"><td>${company.name}</td><td>NO USER</td><td><button id="${company.uri}but" class="btn btn-light">No user</button>`;
+        }
+    }
+}
+
+function nextPage(){
+    if(units < 989) {
+        units += 10;
+        table = "";
+        elem.innerHTML="";
+        load()
+    }
+}
+
+function prevPage() {
+    if(units > 9){
+        units -= 10;
+        table = "";
+        elem.innerHTML="";
+        load()
+    }
 }
