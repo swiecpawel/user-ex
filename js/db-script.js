@@ -5,7 +5,10 @@ const usersSite = "http://localhost:3000/users";
 
 let table ="";
 let units = 0; // from {units} to 10 elements
+let usersTab = "";
 load();
+
+console.log(elem);
 
 async function load() {
 
@@ -13,25 +16,10 @@ async function load() {
     let companies       = await fetch(companiesSite).then(res => res.json());
     let sortedCompanies = await sortCompanyById(user,companies);
 
-   paginationCompany(sortedCompanies, units);
-   elem.insertAdjacentHTML('beforeend', table);
-   ;
+    paginationCompany(sortedCompanies, units);
+
 }
 
-
-async function reduceFunction(uri){
-
-    let idCompany = document.getElementById(uri);
-    let idButton = document.getElementById(uri+"but");
-    let usersTable = "";
-
-    await fetch(usersSite).then(res => res.json())
-        .then(data => data.filter(el => el.uris.company === uri))
-        .then(data => data.forEach(us => {
-            usersTable += `<tr class="${uri}cls"><td>${us.name}</td><td>${us.email}</td><td></td></tr>`
-        }))
-        .then(() => idCompany.insertAdjacentHTML('afterend', usersTable)).then(() => idButton.style.display="none")
-}
 
 function sortCompanyById(users, companies){
 
@@ -40,13 +28,14 @@ function sortCompanyById(users, companies){
 
     companies.map(function(el){
         el.usersAmount = 0;
+        el.users = {};
     });
-
 
     companies.forEach( el => {
         uri = el.uri;
         wObject = users.filter(el => el.uris.company === uri);
         el.usersAmount = wObject.length;
+        el.users = wObject;
     });
 
     companies.sort(function(a, b) {
@@ -60,16 +49,26 @@ function paginationCompany(srtCompanies, limit) {
 
 
     for (let i = limit; i < limit + 10; i++) {
+
         let company = srtCompanies[i];
-        if (company.usersAmount > 0) {
-            table += `<tr id="${company.uri}"><td>${company.name}</td><td>USERS: ${company.usersAmount}</td><td><button id="${company.uri}but" class="btn btn-light" onclick="reduceFunction('${company.uri}')">Show users</button>`;
-        } else if (company.usersAmount > 0) {
-            table += `<tr id="${company.uri}"><td>${company.name}</td><td>USER: ${company.usersAmount}</td><td><button id="${company.uri}but" class="btn btn-light" onclick="reduceFunction('${company.uri}')">Show user</button>`;
-        } else {
-            table += `<tr id="${company.uri}"><td>${company.name}</td><td>NO USER</td><td><button id="${company.uri}but" class="btn btn-light">No user</button>`;
-        }
+
+        table += `<tr id="${company.uri}"><td>${company.name}</td><td>${company.usersAmount}</td>
+                  <td><button id="${company.uri}but" class="btn btn-light" 
+                  onclick="showUsers('${company.uri}', ${company.usersAmount}, ${company.usersAmount})" >
+                  Show users</button></td></tr>`;
+
+        company.users.forEach( (us) =>{
+            table += `<tr style="display: none"><td>${us.name}</td><td>${us.email}</td></tr>`
+            }
+        )
+
     }
+
+    elem.insertAdjacentHTML('beforeend', table)
+
 }
+
+
 
 function nextPage(){
     if(units < 989) {
@@ -88,3 +87,26 @@ function prevPage() {
         load()
     }
 }
+
+function showUsers(uri, children) {
+    let idCompany = document.getElementById(uri).nextSibling;
+
+    if (children > 0) {
+        if (idCompany.style.display === 'none')
+        for(let i=0; i < children; i++){
+                 idCompany.style.display = 'block';
+                idCompany = idCompany.nextSibling;
+        } else {
+            for(let i=0; i < children; i++){
+                idCompany.style.display = 'none';
+                idCompany = idCompany.nextSibling;
+            }
+        }
+    }
+}
+
+
+
+
+
+
