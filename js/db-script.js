@@ -1,105 +1,73 @@
-let elem = document.querySelector('#data');
+let elem = document.querySelector('#table-body');
 const companiesSite = "http://localhost:3000/companies";
 const usersSite = "http://localhost:3000/users";
-
-
 let table ="";
-let units = 0; // from {units} to 10 elements
-let usersTab = "";
-load();
-
-console.log(elem);
-
-async function load() {
-
+let units = 0; // from ${units} to 10 elements
+let sortedCompanies = loadAll();
+sortedCompanies.then(el => paginationCompany(el, units));
+async function loadAll() {
     let user            = await fetch(usersSite).then(res => res.json());
     let companies       = await fetch(companiesSite).then(res => res.json());
     let sortedCompanies = await sortCompanyById(user,companies);
-
-    paginationCompany(sortedCompanies, units);
-
+    return sortedCompanies;
 }
-
-
 function sortCompanyById(users, companies){
-
     let uri;
-    let wObject;
-
-    companies.map(function(el){
-        el.usersAmount = 0;
-        el.users = {};
+    let sortedCompaniesAddedUsers;
+    companies.map(company => {
+        company.usersAmount = 0;
+        company.users = {};
     });
-
-    companies.forEach( el => {
-        uri = el.uri;
-        wObject = users.filter(el => el.uris.company === uri);
-        el.usersAmount = wObject.length;
-        el.users = wObject;
+    companies.forEach( company => {
+        uri = company.uri;
+        sortedCompaniesAddedUsers = users.filter(company => company.uris.company === uri);
+        company.usersAmount = sortedCompaniesAddedUsers.length;
+        company.users = sortedCompaniesAddedUsers;
     });
-
-    companies.sort(function(a, b) {
-        return a.usersAmount - b.usersAmount;
-    });
-
+    companies.sort((a, b) => a.usersAmount - b.usersAmount);
     return companies;
 }
-
 function paginationCompany(srtCompanies, limit) {
-
-
     for (let i = limit; i < limit + 10; i++) {
-
         let company = srtCompanies[i];
-
         table += `<tr id="${company.uri}"><td>${company.name}</td><td>${company.usersAmount}</td>
                   <td><button id="${company.uri}but" class="btn btn-light" 
                   onclick="showUsers('${company.uri}', ${company.usersAmount}, ${company.usersAmount})" >
                   Show users</button></td></tr>`;
-
         company.users.forEach( (us) =>{
             table += `<tr style="display: none"><td>${us.name}</td><td>${us.email}</td></tr>`
             }
         )
-
     }
-
     elem.insertAdjacentHTML('beforeend', table)
-
 }
-
-
-
 function nextPage(){
     if(units < 989) {
         units += 10;
         table = "";
         elem.innerHTML="";
-        load()
+        sortedCompanies.then(el => paginationCompany(el, units))
     }
 }
-
 function prevPage() {
     if(units > 9){
         units -= 10;
         table = "";
         elem.innerHTML="";
-        load()
+        sortedCompanies.then(el => paginationCompany(el, units))
     }
 }
-
-function showUsers(uri, children) {
-    let idCompany = document.getElementById(uri).nextSibling;
-
-    if (children > 0) {
-        if (idCompany.style.display === 'none')
-        for(let i=0; i < children; i++){
-                 idCompany.style.display = 'block';
-                idCompany = idCompany.nextSibling;
+function showUsers(uri, users) {
+    let displayedCompany = document.getElementById(`${uri}`).nextSibling;
+    if (users > 0) {
+        if (displayedCompany.style.display === 'none')
+        for(let i=0; i < users; i++){
+            displayedCompany.style.display = 'block';
+            displayedCompany = displayedCompany.nextSibling;
         } else {
-            for(let i=0; i < children; i++){
-                idCompany.style.display = 'none';
-                idCompany = idCompany.nextSibling;
+            for(let i=0; i < users; i++){
+                displayedCompany.style.display = 'none';
+                displayedCompany = displayedCompany.nextSibling;
             }
         }
     }
