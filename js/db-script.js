@@ -30,12 +30,12 @@ function sortCompanyById(users, companies){
 function paginationCompany(srtCompanies, limit) {
     for (let i = limit; i < limit + 10; i++) {
         let company = srtCompanies[i];
-        table += `<tr id="${company.uri}"><td>${company.name}</td><td>${company.usersAmount}</td>
+        table += `<tr id="${company.uri}"><td>${company.name}</td><td class="td_weight">${company.usersAmount}</td>
                   <td><button id="${company.uri}but" class="btn btn-light" 
                   onclick="showUsers('${company.uri}', ${company.usersAmount}, ${company.usersAmount})" >
                   Show users</button></td></tr>`;
         company.users.forEach( (us) =>{
-            table += `<tr style="display: none"><td>${us.name}</td><td>${us.email}</td></tr>`
+            table += `<tr style="display: none"><td>${us.name}</td><td>${us.email}</td><td></td></tr>`
             }
         )
     }
@@ -62,7 +62,7 @@ function showUsers(uri, users) {
     if (users > 0) {
         if (displayedCompany.style.display === 'none')
         for(let i=0; i < users; i++){
-            displayedCompany.style.display = 'block';
+            displayedCompany.style.display = '';
             displayedCompany = displayedCompany.nextSibling;
         } else {
             for(let i=0; i < users; i++){

@@ -7,4 +7,13 @@
     flex-direction: column;
     border-color: aquamarine;
 }
-
+.btn {
+    padding: 2px 2px 2px 2px;
+}
+.td_weight {
+    min-width: 500px;
+    text-align: center;
+}
+td {
+    height: 55px;
+}
