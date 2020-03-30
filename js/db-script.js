@@ -3,7 +3,7 @@ const companiesSite = "http://localhost:3000/companies";
 const usersSite = "http://localhost:3000/users";
 let table ="";
 let units = 0; //start unit
-let sortedCompanies = loadAll();
+const sortedCompanies = loadAll();
 sortedCompanies.then(el => renderCompany(el, units));
 async function loadAll() {
     const user            = await fetch(usersSite).then(res => res.json());
