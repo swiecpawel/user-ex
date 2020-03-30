@@ -2,13 +2,13 @@ let elem = document.querySelector('#table-body');
 const companiesSite = "http://localhost:3000/companies";
 const usersSite = "http://localhost:3000/users";
 let table ="";
-let units = 0; // from ${units} to 10 elements
+let units = 0; //start unit
 let sortedCompanies = loadAll();
-sortedCompanies.then(el => paginationCompany(el, units));
+sortedCompanies.then(el => renderCompany(el, units));
 async function loadAll() {
-    let user            = await fetch(usersSite).then(res => res.json());
-    let companies       = await fetch(companiesSite).then(res => res.json());
-    let sortedCompanies = await sortCompanyById(user,companies);
+    const user            = await fetch(usersSite).then(res => res.json());
+    const companies       = await fetch(companiesSite).then(res => res.json());
+    const sortedCompanies = await sortCompanyById(user,companies);
     return sortedCompanies;
 }
 function sortCompanyById(users, companies){
@@ -27,7 +27,7 @@ function sortCompanyById(users, companies){
     companies.sort((a, b) => a.usersAmount - b.usersAmount);
     return companies;
 }
-function paginationCompany(srtCompanies, limit) {
+function renderCompany(srtCompanies, limit) {
     for (let i = limit; i < limit + 10; i++) {
         let company = srtCompanies[i];
         table += `<tr id="${company.uri}"><td>${company.name}</td><td class="td_weight">${company.usersAmount}</td>
@@ -46,7 +46,7 @@ function nextPage(){
         units += 10;
         table = "";
         elem.innerHTML="";
-        sortedCompanies.then(el => paginationCompany(el, units))
+        sortedCompanies.then(el => renderCompany(el, units))
     }
 }
 function prevPage() {
@@ -54,7 +54,7 @@ function prevPage() {
         units -= 10;
         table = "";
         elem.innerHTML="";
-        sortedCompanies.then(el => paginationCompany(el, units))
+        sortedCompanies.then(el => renderCompany(el, units))
     }
 }
 function showUsers(uri, users) {
